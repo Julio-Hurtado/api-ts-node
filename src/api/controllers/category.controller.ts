@@ -1,6 +1,12 @@
 import { NextFunction, Request, Response } from 'express';
+import { UploadedFile } from 'express-fileupload';
+import { updateImage } from '../../helpers/update-file';
+import { uploadFile } from '../../helpers/upload-file';
+import CategoryDto from '../../models/categoryDto';
 import { ICategory } from '../../models/ICategory';
 import CategoryService from '../services/category.service';
+
+const folder = 'categories';
 
 export default class CategoryController {
   async get(req: Request, res: Response, next: NextFunction) {
@@ -12,18 +18,42 @@ export default class CategoryController {
         pageSize: Number(pageSize),
       });
 
-      res.status(200).send({ body: categories });
+      res.status(200).send({
+        body: categories.map(
+          (cat) => new CategoryDto(cat.Id, cat.Name, cat.Image, cat.CreatedAt),
+        ),
+      });
     } catch (error) {
       next(error);
     }
   }
+
   async find(req: Request, res: Response, next: NextFunction) {
     const { id } = req.params;
     try {
       const service = new CategoryService();
       const categoryFound = await service.findCategory(Number(id));
+
       if (!categoryFound) throw new Error('Not found');
-      res.status(200).send({ body: categoryFound });
+
+      res.status(200).send({
+        body: new CategoryDto(
+          categoryFound.Id,
+          categoryFound.Name,
+          categoryFound.Image,
+          categoryFound.CreatedAt,
+        ),
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async totalCount(req: Request, res: Response, next: NextFunction) {
+    try {
+      const service = new CategoryService();
+      const total = await service.totalCategories();
+      res.status(200).send({ total: total[''] });
     } catch (error) {
       next(error);
     }
@@ -31,15 +61,22 @@ export default class CategoryController {
 
   async create(req: Request, res: Response, next: NextFunction) {
     try {
-      const { name, image } = req.body;
+      const { files } = req;
+
+      const fileName = await uploadFile(
+        files?.file as UploadedFile,
+        null,
+        folder,
+      );
+
       const service = new CategoryService();
       const category: Omit<ICategory, 'Id'> = {
-        Name: name,
-        Image: image,
+        Name: req.body.name,
+        Image: fileName ?? '',
         CreatedAt: new Date(),
       };
-      const newCategory = await service.createCategory(category);
-      console.log(newCategory);
+
+      await service.createCategory(category);
       res.status(201).send({ mesage: 'Created Ok' });
     } catch (error) {
       next(error);
@@ -49,21 +86,29 @@ export default class CategoryController {
   async put(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
-      const { name, image } = req.body;
+      const { name } = req.body;
+      let newImage!: string;
+
       const service = new CategoryService();
       const categoryFound = await service.findCategory(Number(id));
+
       if (!categoryFound) throw new Error('Not found');
+
+      if (req.files) {
+        newImage = await updateImage(
+          req.files?.file as UploadedFile,
+          categoryFound.Image,
+          folder,
+        );
+      }
 
       const category: Omit<ICategory, 'CreatedAt'> = {
         Id: Number(id),
         Name: name ?? categoryFound.Name,
-        Image: image ?? categoryFound.Image,
+        Image: newImage ?? categoryFound.Image,
       };
-      const categoryUpdated = await service.updateCategory(
-        category.Id,
-        category,
-      );
-      console.log(categoryUpdated);
+
+      await service.updateCategory(category.Id, category);
       res.status(200).send({ mesage: 'Update Successfull' });
     } catch (error) {
       next(error);
