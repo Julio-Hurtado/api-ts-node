@@ -1,4 +1,6 @@
 import express, { Application } from 'express';
+import cors from 'cors';
+import fileUpload from 'express-fileupload';
 import path from 'path';
 import Routes from './routes';
 
@@ -28,9 +30,17 @@ export default class ServerExpress {
   }
 
   private middleware(): void {
+    this._app.use(cors());
     this._app.use(express.json());
     this._app.use(express.urlencoded({ extended: false }));
     this._app.disable('x-powered-by');
+    this._app.use(
+      fileUpload({
+        createParentPath: true,
+        tempFileDir: '/temp/',
+        useTempFiles: true,
+      }),
+    );
     // this._app.use(express.static(this.publicPath));
   }
 
