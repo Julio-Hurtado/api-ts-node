@@ -13,6 +13,7 @@ export default class CategoryRoutes {
   public get routes() {
     this._router
       .get('/', verifyPagination, this.controller.get)
+      .get('/total', this.controller.totalCount)
       .get('/:id', this.controller.find)
       .post('/', this.controller.create)
       .put('/:id', this.controller.put);
