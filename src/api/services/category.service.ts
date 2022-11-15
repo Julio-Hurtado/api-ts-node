@@ -46,7 +46,21 @@ export default class CategoryService {
       throw error;
     }
   }
-
+  async totalCategories() {
+    try {
+      await this.database.connect();
+      const { recordset } = await this.database.pool
+        .request()
+        .query<Array<{ [total: string]: number }>>(
+          'Select Count(Id) From Category',
+        );
+      await this.database.close();
+      return recordset[0];
+    } catch (error) {
+      await this.database.close();
+      throw error;
+    }
+  }
   async createCategory(data: Omit<ICategory, 'Id'>) {
     try {
       await this.database.connect();
