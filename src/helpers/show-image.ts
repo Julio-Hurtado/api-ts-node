@@ -1,6 +1,5 @@
-import path from 'path';
-import fs from 'fs';
 import { findCategory } from './findCategory';
+import { getLocalPathImage } from './find-path-image';
 
 export const getImagePath = async (entity: string, id: number) => {
   let image: string | null;
@@ -15,11 +14,6 @@ export const getImagePath = async (entity: string, id: number) => {
     default:
       throw new Error('not implemented yet');
   }
-  if (image) {
-    const pathImg = path.join(__dirname, '../uploads', entity, image);
-    if (fs.existsSync(pathImg)) {
-      return pathImg;
-    }
-  }
-  return null;
+  const { path } = await getLocalPathImage(image, entity);
+  return path;
 };
