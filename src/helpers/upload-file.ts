@@ -15,9 +15,10 @@ export const uploadFile = (
     const extension = nameShort[nameShort.length - 1];
 
     if (!extensionsValid.includes(extension)) {
-      reject();
-      new Error(
-        `extension file ${extension} invalid, valids -> ${extensionsValid}`,
+      reject(
+        new Error(
+          `extension file ${extension} invalid, valids -> ${extensionsValid}`,
+        ),
       );
     } else {
       const nameTemp = `${crypto.randomUUID()}.${extension}`;
