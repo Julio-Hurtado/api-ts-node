@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { UploadedFile } from 'express-fileupload';
-import { updateImage } from '../../helpers/update-file';
-import { uploadFile } from '../../helpers/upload-file';
+import { updateImage } from '../../helpers/upload-file/update-file';
+import { uploadFile } from '../../helpers/upload-file/upload-file';
 import CategoryDto from '../../models/categoryDto';
 import { ICategory } from '../../models/ICategory';
 import CategoryService from '../services/category.service';
