@@ -6,4 +6,5 @@ export const enviroment = {
   userPassword: process.env.PASSWORD as string,
   serverDb: process.env.SERVER_DB as string,
   database: process.env.DATABASE_NAME as string,
+  secretKeyJwt: process.env.SECRETKEY_JWT as string,
 };
