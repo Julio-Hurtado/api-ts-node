@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { getImagePath } from '../../helpers/show-image';
+import { getImagePath } from '../../helpers/upload-file/show-image';
 
 export default class UploadController {
   async uploadImage(req: Request, res: Response, next: NextFunction) {
