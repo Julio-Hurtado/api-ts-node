@@ -12,9 +12,15 @@ export class AuthRoutes {
 
   public get routes() {
     this.router
-      .get('/perfil', isAuthenticated, this.controller.perfil)
-      .post('/register', this.controller.register)
-      .post('/login', this.controller.login);
+      .get('/perfil', isAuthenticated, (req, res, next) =>
+        this.controller.perfil(req, res, next),
+      )
+      .post('/register', (req, res, next) =>
+        this.controller.register(req, res, next),
+      )
+      .post('/login', (req, res, next) =>
+        this.controller.login(req, res, next),
+      );
     return this.router;
   }
 }
