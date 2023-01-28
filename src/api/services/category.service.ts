@@ -1,3 +1,4 @@
+import { handlerError } from '../../database/handler-error';
 import SqlServer from '../../database/sqlServer';
 import { ICategory } from '../../models/ICategory';
 import { IPage } from '../../models/Ipage';
@@ -20,11 +21,12 @@ export default class CategoryService {
           'Select Id,Name,Image,CreatedAt from Category Order By Id Offset @pageNumber Rows Fetch Next @pageSize Rows Only',
         );
 
-      await this.database.close();
       return recordset;
-    } catch (error: unknown) {
+    } catch (error) {
+      const dbError = handlerError(error as Error);
+      throw dbError;
+    } finally {
       await this.database.close();
-      throw error;
     }
   }
 
@@ -39,11 +41,12 @@ export default class CategoryService {
           'Select Id,Name,Image,CreatedAt From Category Where Id=@Id',
         );
 
-      await this.database.close();
       return recordset[0];
     } catch (error) {
+      const dbError = handlerError(error as Error);
+      throw dbError;
+    } finally {
       await this.database.close();
-      throw error;
     }
   }
   async totalCategories() {
@@ -54,11 +57,12 @@ export default class CategoryService {
         .query<Array<{ [total: string]: number }>>(
           'Select Count(Id) From Category',
         );
-      await this.database.close();
       return recordset[0];
     } catch (error) {
+      const dbError = handlerError(error as Error);
+      throw dbError;
+    } finally {
       await this.database.close();
-      throw error;
     }
   }
   async createCategory(data: Omit<ICategory, 'Id'>) {
@@ -74,11 +78,12 @@ export default class CategoryService {
           'Insert into Category(Name,Image,CreatedAt) values (@Name,@Image,@CreatedAt)',
         );
 
-      await this.database.close();
       return request;
     } catch (error: unknown) {
+      const dbError = handlerError(error as Error);
+      throw dbError;
+    } finally {
       await this.database.close();
-      throw error;
     }
   }
 
@@ -93,11 +98,12 @@ export default class CategoryService {
         .input('Name', this.database.types.VarChar(50), data.Name)
         .query('Update Category Set Name=@Name, Image=@Image Where Id=@Id');
 
-      await this.database.close();
       return request;
     } catch (error) {
+      const dbError = handlerError(error as Error);
+      throw dbError;
+    } finally {
       await this.database.close();
-      throw error;
     }
   }
 }
