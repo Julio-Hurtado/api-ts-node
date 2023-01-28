@@ -22,7 +22,12 @@ export const uploadFile = (
       );
     } else {
       const nameTemp = `${crypto.randomUUID()}.${extension}`;
-      const uploadPath = path.join(__dirname, '../uploads/', folder, nameTemp);
+      const uploadPath = path.join(
+        __dirname,
+        '../../uploads/',
+        folder,
+        nameTemp,
+      );
 
       file.mv(uploadPath, (err) => {
         if (err) {
